@@ -1,0 +1,57 @@
+const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+
+const client = new Client({
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--disable-gpu',
+    ],
+  },
+});
+
+client.on('qr', (qr) => {
+  qrcode.generate(qr, { small: true });
+  console.log('Scan the QR code above with whatsapp');
+});
+
+client.on('ready', async () => {
+  console.log('Whatsapp connected');
+  try {
+    const chats = await client.getChats();
+    console.log('Fetched chats:', chats.length);
+    chats.forEach((chat) => {
+      if (
+        chat.isGroup &&
+        chat.id._serialized === '120363185615010394@g.us'
+      ) {
+        console.log(
+          `Name: ${chat.name} | ID: ${chat.id._serialized} | isGroup: ${chat.isGroup}`,
+        );
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching chats:', error);
+  }
+});
+
+client.on('auth_failure', (msg) => {
+  console.error('Authentication failed:', msg);
+});
+
+client.on('disconnected', (reason) => {
+  console.log('Client was disconnected:', reason);
+});
+
+client.on('loading_screen', (percent, message) => {
+  console.log('Loading screen:', percent, message);
+});
+
+client.initialize();
