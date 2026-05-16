@@ -24,22 +24,7 @@ client.on('qr', (qr) => {
 
 client.on('ready', async () => {
   console.log('Whatsapp connected');
-  try {
-    const chats = await client.getChats();
-    console.log('Fetched chats:', chats.length);
-    chats.forEach((chat) => {
-      if (
-        chat.isGroup &&
-        chat.id._serialized === '120363185615010394@g.us'
-      ) {
-        console.log(
-          `Name: ${chat.name} | ID: ${chat.id._serialized} | isGroup: ${chat.isGroup}`,
-        );
-      }
-    });
-  } catch (error) {
-    console.error('Error fetching chats:', error);
-  }
+  
 });
 
 client.on('auth_failure', (msg) => {
@@ -54,4 +39,4 @@ client.on('loading_screen', (percent, message) => {
   console.log('Loading screen:', percent, message);
 });
 
-client.initialize();
+module.exports = client
